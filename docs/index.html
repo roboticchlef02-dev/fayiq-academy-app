@@ -222,7 +222,7 @@ VIEW.more=()=>{
    :`<form class="card" onsubmit="pairSubmit(event)"><b>ربط بحاسوب الأكاديمية</b><div class="fld" style="margin-top:10px"><input name="c" dir="ltr" placeholder="الصق رابط أو رمز الربط" required></div><button class="btn pri" style="width:100%">ربط</button></form>`;
   const m=(ic,t,s,fn)=>`<button class="card row" onclick="${fn}">${IC[ic]}<div class="mid"><b>${t}</b><small>${s}</small></div></button>`;
   return sy+`<div class="menu"><div class="h">الإدارة</div>${m('teach','الأساتذة والمواد','إضافة وتعديل الأساتذة والأسعار والنسب','openS(teaList)')}${m('set','الإعدادات','اسم الأكاديمية، حصص الاشتراك، القوائم','openS(setForm)')}${m('save','نسخة احتياطية','تنزيل ملف بكل البيانات','backup()')}
-  <div class="h">تثبيت التطبيق</div><div class="card" style="color:var(--mute)">Android: قائمة المتصفح ⋮ ← «إضافة إلى الشاشة الرئيسية».<br>iPhone: زر المشاركة ← «إضافة إلى الشاشة الرئيسية».</div></div>`;
+  ${NATIVE?'':`<div class="h">تثبيت التطبيق</div><div class="card" style="color:var(--mute)">Android: قائمة المتصفح ⋮ ← «إضافة إلى الشاشة الرئيسية».<br>iPhone: زر المشاركة ← «إضافة إلى الشاشة الرئيسية».</div>`}</div>`;
 };
 const FABS={stu:()=>openS(stuForm),moneyexp:()=>openS(()=>expForm())};
 function fabTap(){(FABS[TAB+(TAB==='money'?F.mt:'')]||(()=>{}))()}
@@ -330,7 +330,14 @@ function setForm(){
 function setSave(ev){ev.preventDefault();const f=ev.target,ln=t=>t.split('\n').map(x=>x.trim()).filter(Boolean);
   S.settings.name=f.name.value.trim()||'فايق أكاديمي';S.settings.cycle=Math.min(4,Math.max(1,num(f.cycle.value)||4));
   S.lists={levels:ln(f.levels.value),subjects:ln(f.subjects.value),methods:ln(f.methods.value),cats:ln(f.cats.value)};save();closeS();render();toast('تم الحفظ')}
-function backup(){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(S)],{type:'application/json'}));a.download='fayiq-backup-'+today()+'.json';document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500)}
+const NATIVE=!!(window.Capacitor&&Capacitor.isNativePlatform&&Capacitor.isNativePlatform());
+async function backup(){
+  if(NATIVE&&Capacitor.Plugins.Filesystem&&Capacitor.Plugins.Share){
+    try{const f=await Capacitor.Plugins.Filesystem.writeFile({path:'fayiq-backup-'+today()+'.json',data:JSON.stringify(S),directory:'CACHE',encoding:'utf8'});
+      await Capacitor.Plugins.Share.share({title:'نسخة احتياطية — فايق أكاديمي',url:f.uri,dialogTitle:'احفظ النسخة الاحتياطية'})}
+    catch(e){if(!/cancel/i.test(String(e&&e.message)))toast('تعذّر إنشاء النسخة الاحتياطية')}
+    return}
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(S)],{type:'application/json'}));a.download='fayiq-backup-'+today()+'.json';document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500)}
 
 /* ---------- pairing ---------- */
 async function pairSubmit(ev){
@@ -348,6 +355,13 @@ load();render();
     try{await enableSync('FQ1.'+m[1].replace(/^FQ1\./,''));render();toast('تم الربط بنجاح')}catch(e){render();toast(e.message||'فشل الربط')}}
   startSyncTimers();
 })();
+if(NATIVE&&Capacitor.Plugins.App){
+  Capacitor.Plugins.App.addListener('backButton',()=>{
+    if(SH){closeS();return}
+    if(TAB!=='home'){go('home');return}
+    Capacitor.Plugins.App.exitApp();
+  });
+}
 if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
 </script>
 </body>
