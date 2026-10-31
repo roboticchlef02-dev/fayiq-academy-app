@@ -99,7 +99,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--acc)}
 <script>
 const KEY='fayiq_academy_v1',$=id=>document.getElementById(id);
 const SEED={v:1,settings:{cycle:4,name:'فايق أكاديمي',lastBackup:null},lists:{levels:['ابتدائي','متوسط','ثانوي'],subjects:['الرياضيات','اللغة الفرنسية','اللغة الإنجليزية','الفيزياء'],methods:['نقدًا','CCP','BaridiMob','تحويل بنكي'],cats:['إيجار','كهرباء','ماء','إنترنت','رواتب','تجهيزات ولوازم','تسويق وإشهار','صيانة','أخرى']},teachers:[],enr:[],pay:[],exp:[],tpay:[],seq:{t:0,p:0,x:0}};
-let S,TAB='home',F={q:'',lv:'',chip:'',mt:'pay'},LAST='',SH=null;
+let APKUP=null,S,TAB='home',F={q:'',lv:'',chip:'',mt:'pay'},LAST='',SH=null;
 
 /* ---------- storage ---------- */
 function load(){try{const r=localStorage.getItem(KEY);S=r?JSON.parse(r):JSON.parse(JSON.stringify(SEED))}catch(e){S=JSON.parse(JSON.stringify(SEED))}fix()}
@@ -164,12 +164,13 @@ async function syncTap(){
 const VIEW={},FAB={stu:1,exp0:0,moneyexp:1,moneypay:0,moneytea:0};
 VIEW.home=()=>{
   if(!S.enr.length&&!syncOn())return onboarding();
+  const apk=APKUP?`<div class="warn" style="background:#e5f6ec;color:var(--ok)"><b>يوجد إصدار جديد للتطبيق (${esc(APKUP.versionName)})</b><div class="btns"><button class="btn pri" onclick="openApk()">تنزيل وتحديث</button></div></div>`:'';
   const t=totals(),rn=S.enr.filter(e=>info(e).renew).length;
   const stat=(l,v)=>`<div class="stat"><small>${l}</small><b>${v}</b></div>`;
   const nt=TN().filter(n=>tTotals(n).left>0).length;
   const item=(txt,n,fn,cls)=>n?`<button class="card row" onclick="${fn}"><div class="mid"><b>${txt}</b></div><span class="chip ${cls}">${n}</span></button>`:'';
   const alerts=item('اشتراكات بانتظار التجديد',rn,"go('att')",'t-warn')+item('تلاميذ لم يدفعوا',t.unpaid,"F.chip='due';go('money')",'t-bad')+item('أساتذة لهم رواتب متبقية',nt,"F.mt='tea';go('money')",'t-warn');
-  return`<div class="hero"><small>الربح الصافي</small><div class="big">${money(t.net)}</div><small>بعد المصاريف ورواتب الأساتذة المستحقة</small></div>
+  return apk+`<div class="hero"><small>الربح الصافي</small><div class="big">${money(t.net)}</div><small>بعد المصاريف ورواتب الأساتذة المستحقة</small></div>
   <div class="grid">${stat('المداخيل',money(t.income))}${stat('المصاريف',money(t.exp))}${stat('رواتب مستحقة',money(t.earned))}${stat('المتبقي للتحصيل',money(t.rest))}</div>
   <div class="grid">${stat('التلاميذ',t.students)}${stat('الاشتراكات المسجلة',t.enr)}</div>
   <div class="h">تحتاج انتباهك</div>${alerts||'<div class="empty">كل شيء على ما يرام</div>'}`;
@@ -359,6 +360,18 @@ async function pairSubmit(ev){
 }
 function unpair(){if(!confirm('فصل هذا الهاتف؟ تبقى البيانات على الهاتف.'))return;disableSync();render()}
 
+/* ---------- app updates (the Android shell; screens update by themselves) ---------- */
+async function checkApk(){
+  if(!NATIVE||!Capacitor.Plugins.App||!Capacitor.Plugins.App.getInfo)return;
+  try{const info=await Capacitor.Plugins.App.getInfo(),r=await fetch('app-version.json?t='+Date.now(),{cache:'no-store'}),v=await r.json();
+    if(+v.versionCode>+info.build){APKUP=v;render()}}catch(e){}
+}
+function openApk(){
+  const u=APKUP&&APKUP.url;if(!u)return;
+  if(Capacitor.Plugins.Browser)Capacitor.Plugins.Browser.open({url:u});else window.open(u,'_blank');
+  toast('بعد التنزيل افتح الملف واضغط «تثبيت»');
+}
+
 /* ---------- start ---------- */
 load();render();
 (async()=>{
@@ -367,6 +380,7 @@ load();render();
     $('v').innerHTML='<div class="hello"><h2>جارٍ الربط…</h2></div>';
     try{await enableSync('FQ1.'+m[1].replace(/^FQ1\./,''));render();toast('تم الربط بنجاح')}catch(e){render();toast(e.message||'فشل الربط')}}
   startSyncTimers();
+  checkApk();setInterval(checkApk,6*3600*1000);
 })();
 if(NATIVE&&Capacitor.Plugins.App){
   Capacitor.Plugins.App.addListener('backButton',()=>{
