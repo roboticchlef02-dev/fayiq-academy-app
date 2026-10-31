@@ -166,6 +166,9 @@ function startSyncTimers(){
 }
 async function enableSync(tokenOrCode){
   const v=String(tokenOrCode||'').trim();
+  if(!v)throw new Error('الصق رمز GitHub أولًا');
+  if(/^https?:/i.test(v)&&!v.includes('#c='))throw new Error('هذا رابط وليس رمزًا. الرمز نص طويل يبدأ بـ github_pat_ تحصل عليه من صفحة GitHub (الخطوة 1 إلى 3).');
+  if(!v.startsWith('FQ1.')&&!v.includes('#c=')&&!/^(github_pat_|ghp_|gho_)/.test(v.replace(/^.*\s/,'')))throw new Error('هذا ليس رمز GitHub. الرمز الصحيح يبدأ بـ github_pat_');
   const cfg=v.startsWith('FQ1.')||v.includes('#c=')?parsePair(v):{t:v.replace(/^.*\s/,''),k:(S.sync&&S.sync.cfg&&S.sync.cfg.k)||newKey()};
   if(!cfg.t)throw new Error('الصق رمز GitHub أولًا');
   const y=syncMeta();const old=y.cfg;y.cfg=cfg;
