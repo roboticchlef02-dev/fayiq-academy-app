@@ -223,7 +223,7 @@ VIEW.more=()=>{
   const m=(ic,t,s,fn)=>`<button class="card row" onclick="${fn}">${IC[ic]}<div class="mid"><b>${t}</b><small>${s}</small></div></button>`;
   return sy+`<div class="menu"><div class="h">الإدارة</div>${m('teach','الأساتذة والمواد','إضافة وتعديل الأساتذة والأسعار والنسب','openS(teaList)')}${m('set','الإعدادات','اسم الأكاديمية، حصص الاشتراك، القوائم','openS(setForm)')}${m('save','نسخة احتياطية','تنزيل ملف بكل البيانات','backup()')}
   ${NATIVE?'':`<div class="h">تثبيت التطبيق</div><div class="card" style="color:var(--mute)">Android: قائمة المتصفح ⋮ ← «إضافة إلى الشاشة الرئيسية».<br>iPhone: زر المشاركة ← «إضافة إلى الشاشة الرئيسية».</div>`}
-  <div class="h">عن التطبيق</div><div class="card"><div class="li"><span>إصدار تطبيق أندرويد</span><b dir="ltr">${NATIVE?esc(NATVER||'…'):'نسخة الويب'}</b></div><div class="li"><span>آخر إصدار منشور</span><b dir="ltr">${APKUP?esc(APKUP.versionName)+' (متاح)':'لا جديد'}</b></div></div></div>`;
+  <div class="h">عن التطبيق</div><div class="card"><div class="btns" style="margin:0 0 6px"><button class="btn pri" onclick="checkApk(true)">التحقق من التحديثات</button><button class="btn ghost" onclick="location.reload()">إعادة تحميل</button></div><div class="li"><span>إصدار تطبيق أندرويد</span><b dir="ltr">${NATIVE?esc(NATVER||'…'):'نسخة الويب'}</b></div><div class="li"><span>آخر إصدار منشور</span><b dir="ltr">${APKUP?esc(APKUP.versionName)+' (متاح)':'لا جديد'}</b></div></div></div>`;
 };
 const FABS={stu:()=>openS(stuForm),moneyexp:()=>openS(()=>expForm())};
 function fabTap(){(FABS[TAB+(TAB==='money'?F.mt:'')]||(()=>{}))()}
@@ -362,10 +362,10 @@ function unpair(){if(!confirm('فصل هذا الهاتف؟ تبقى البيا�
 
 const apkBanner=()=>APKUP?`<div class="warn" style="background:#e5f6ec;color:var(--ok)"><b>يوجد إصدار جديد للتطبيق (${esc(APKUP.versionName)})</b><div class="btns"><button class="btn pri" onclick="openApk()">تنزيل وتحديث</button></div></div>`:'';
 /* ---------- app updates (the Android shell; screens update by themselves) ---------- */
-async function checkApk(){
-  if(!NATIVE||!Capacitor.Plugins.App||!Capacitor.Plugins.App.getInfo)return;
+async function checkApk(manual){
+  if(!NATIVE||!Capacitor.Plugins.App||!Capacitor.Plugins.App.getInfo){if(manual)toast('هذه نسخة الويب وتتحدّث تلقائيًا');return}
   try{const info=await Capacitor.Plugins.App.getInfo();NATVER=info.version+' (رقم '+info.build+')';if(TAB==='more')render();const r=await fetch('app-version.json?t='+Date.now(),{cache:'no-store'}),v=await r.json();
-    if(+v.versionCode>+info.build){APKUP=v;render()}}catch(e){}
+    if(+v.versionCode>+info.build){APKUP=v;render();if(manual)toast('يوجد إصدار جديد: '+v.versionName)}else if(manual){APKUP=null;render();toast('أنت تستخدم آخر إصدار ('+info.version+')')}}catch(e){if(manual)toast('تعذّر التحقق. تأكد من الاتصال بالإنترنت.')}
 }
 function openApk(){
   const u=APKUP&&APKUP.url;if(!u)return;
