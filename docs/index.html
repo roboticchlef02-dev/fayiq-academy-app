@@ -129,7 +129,7 @@ function render(){
   const rn=S.enr.reduce((n,e)=>n+(info(e).renew?1:0),0);
   $('tabs').innerHTML=TABS.map(([k,l])=>`<button class="${k===TAB?'on':''}" onclick="go('${k}')">${IC[k==='more'?'more':k]}${l}${k==='att'&&rn?`<span class="badge">${rn}</span>`:''}</button>`).join('');
   const v=$('v'),keep=LAST===TAB,st=v.scrollTop;
-  v.innerHTML=VIEW[TAB]();
+  v.innerHTML=apkBanner()+VIEW[TAB]();
   if(keep)v.scrollTop=st;else v.scrollTop=0;
   LAST=TAB;
   $('fab').style.display=FAB[TAB+(TAB==='money'?F.mt:'')]?'flex':'none';
@@ -164,13 +164,12 @@ async function syncTap(){
 const VIEW={},FAB={stu:1,exp0:0,moneyexp:1,moneypay:0,moneytea:0};
 VIEW.home=()=>{
   if(!S.enr.length&&!syncOn())return onboarding();
-  const apk=APKUP?`<div class="warn" style="background:#e5f6ec;color:var(--ok)"><b>يوجد إصدار جديد للتطبيق (${esc(APKUP.versionName)})</b><div class="btns"><button class="btn pri" onclick="openApk()">تنزيل وتحديث</button></div></div>`:'';
   const t=totals(),rn=S.enr.filter(e=>info(e).renew).length;
   const stat=(l,v)=>`<div class="stat"><small>${l}</small><b>${v}</b></div>`;
   const nt=TN().filter(n=>tTotals(n).left>0).length;
   const item=(txt,n,fn,cls)=>n?`<button class="card row" onclick="${fn}"><div class="mid"><b>${txt}</b></div><span class="chip ${cls}">${n}</span></button>`:'';
   const alerts=item('اشتراكات بانتظار التجديد',rn,"go('att')",'t-warn')+item('تلاميذ لم يدفعوا',t.unpaid,"F.chip='due';go('money')",'t-bad')+item('أساتذة لهم رواتب متبقية',nt,"F.mt='tea';go('money')",'t-warn');
-  return apk+`<div class="hero"><small>الربح الصافي</small><div class="big">${money(t.net)}</div><small>بعد المصاريف ورواتب الأساتذة المستحقة</small></div>
+  return`<div class="hero"><small>الربح الصافي</small><div class="big">${money(t.net)}</div><small>بعد المصاريف ورواتب الأساتذة المستحقة</small></div>
   <div class="grid">${stat('المداخيل',money(t.income))}${stat('المصاريف',money(t.exp))}${stat('رواتب مستحقة',money(t.earned))}${stat('المتبقي للتحصيل',money(t.rest))}</div>
   <div class="grid">${stat('التلاميذ',t.students)}${stat('الاشتراكات المسجلة',t.enr)}</div>
   <div class="h">تحتاج انتباهك</div>${alerts||'<div class="empty">كل شيء على ما يرام</div>'}`;
@@ -360,6 +359,7 @@ async function pairSubmit(ev){
 }
 function unpair(){if(!confirm('فصل هذا الهاتف؟ تبقى البيانات على الهاتف.'))return;disableSync();render()}
 
+const apkBanner=()=>APKUP?`<div class="warn" style="background:#e5f6ec;color:var(--ok)"><b>يوجد إصدار جديد للتطبيق (${esc(APKUP.versionName)})</b><div class="btns"><button class="btn pri" onclick="openApk()">تنزيل وتحديث</button></div></div>`:'';
 /* ---------- app updates (the Android shell; screens update by themselves) ---------- */
 async function checkApk(){
   if(!NATIVE||!Capacitor.Plugins.App||!Capacitor.Plugins.App.getInfo)return;
