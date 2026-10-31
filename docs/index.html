@@ -181,16 +181,16 @@ function onboarding(){return`<div class="hello"><img src="icon-192.png" alt=""><
 VIEW.stu=()=>{
   const l=filt();
   return searchBar('ابحث عن تلميذ أو مادة')+lvChips()+(l.length?l.map(e=>{const i=info(e),p=PST[i.pst];
-    return`<button class="card row" onclick="openS(()=>stuHtml('${e.id}'))"><div class="av">${esc(initial(e.name))}</div><div class="mid"><b>${esc(e.name)}</b><small>${esc(e.subject)} · ${esc(e.level)}</small></div><span class="chip ${p[0]}">${p[1]}</span></button>`}).join(''):'<div class="empty">لا توجد نتائج</div>');
+    return`<button class="card row" onclick="openS(()=>stuHtml('${e.id}'))"><div class="av">${esc(initial(e.name))}</div><div class="mid"><b>${esc(e.name)}</b><small>${esc(e.subject)} · ${esc(e.level)}</small></div>${e.st==='left'?'<span class="chip t-mute">منقطع</span>':`<span class="chip ${p[0]}">${p[1]}</span>`}</button>`}).join(''):'<div class="empty">لا توجد نتائج</div>');
 };
 VIEW.att=()=>{
-  let l=filt();if(F.chip==='renew')l=l.filter(e=>info(e).renew);
+  let l=filt().filter(e=>e.st!=='left');if(F.chip==='renew')l=l.filter(e=>info(e).renew);
   const chips=`<div class="chips"><button class="fc ${F.chip!=='renew'?'on':''}" onclick="F.chip='';redo()">الكل</button><button class="fc ${F.chip==='renew'?'on':''}" onclick="F.chip='renew';redo()">بانتظار التجديد</button></div>`;
   return searchBar('ابحث لتسجيل الحضور')+chips+(l.length?l.map(e=>{const i=info(e),b=Math.min(i.cur,5);
     const st=i.ended?'<span class="chip t-ok">اكتملت الاشتراكات</span>':i.renew?'<span class="chip t-warn">أكمل الدورة — جدّد</span>':`<span class="chip t-mute">${i.bl[i.cur].y} / ${CYC()} · اشتراك ${i.cur+1}</span>`;
     return`<div class="card att ${i.renew?'renew':''}"><div class="top2"><div class="mid"><b>${esc(e.name)}</b><small>${esc(e.subject)}</small></div>${st}</div>
      <div class="cells">${[0,1,2,3].map(k=>cell(e,b*4+k)).join('')}</div>
-     ${i.renew?`<div class="btns"><button class="btn pri" onclick="renewPay('${e.id}')">تجديد + دفعة</button></div>`:''}</div>`}).join(''):'<div class="empty">لا توجد نتائج</div>');
+     ${i.renew?`<div class="btns"><button class="btn pri" onclick="renewPay('${e.id}')">تجديد + دفعة</button><button class="btn ghost" onclick="undoLast('${e.id}')">تراجع عن آخر حصة</button></div>`:''}</div>`}).join(''):'<div class="empty">لا توجد نتائج</div>');
 };
 function cell(e,idx){const a=e.att[idx],c=a?a.v:'';return`<button class="cell ${c}" onclick="tog('${e.id}',${idx})">${c==='y'?'✓':c==='n'?'✗':''}</button>`}
 function tog(id,idx){const e=find(id),a=e.att[idx];e.att[idx]=!a?{v:'y',d:today()}:a.v==='y'?{v:'n',d:null}:null;save();if(navigator.vibrate)navigator.vibrate(12);render()}
@@ -238,10 +238,23 @@ function stuHtml(id){
    <div class="kv"><div><small>سعر الاشتراك</small><b>${money(i.price)}</b></div><div><small>المتبقي</small><b>${money(i.rest)}</b></div><div><small>الدفع</small><b><span class="chip ${p[0]}">${p[1]}</span></b></div></div>
    <div class="btns"><button class="btn pri" onclick="openS(()=>paySheet('${id}'))">تسجيل دفعة</button><button class="btn" onclick="openS(()=>histHtml('${id}'))">سجل الحضور</button></div>
    <div class="lbl">آخر الدفعات</div>${pays.length?pays.slice(0,5).map(x=>`<div class="li"><div><b>${money(x.amount)}</b><br><small>${esc(x.method)}${x.note?' · '+esc(x.note):''}</small></div><small>${fd(x.date)}</small></div>`).join(''):'<div class="sub" style="padding:6px 2px">لا توجد دفعات</div>'}
-   <div class="btns" style="margin-top:16px"><button class="btn" onclick="openS(()=>stuEditForm('${id}'))">تعديل</button><button class="btn danger" onclick="stuDel('${id}')">حذف</button></div>`;
+   ${e.st==='left'?`<div class="warn" style="margin-top:14px;background:#eef0f4;color:var(--ink)"><b>منقطع</b>${e.leftOn?' منذ '+fd(e.leftOn):''}${e.leftWhy?' — '+esc(e.leftWhy):''}</div><div class="btns"><button class="btn pri" onclick="reactivate('${id}')">إعادة تفعيل</button></div>`:`<div class="btns" style="margin-top:16px"><button class="btn" onclick="openS(()=>dropForm('${id}'))">تسجيل كمنقطع</button></div>`}
+   ${i.renew?`<div class="btns"><button class="btn ghost" onclick="undoLast('${id}')">تراجع عن آخر حصة</button></div>`:''}
+   <div class="btns" style="margin-top:10px"><button class="btn" onclick="openS(()=>stuEditForm('${id}'))">تعديل</button><button class="btn danger" onclick="stuDel('${id}')">حذف</button></div>`;
 }
 function histHtml(id){const e=find(id),i=info(e);
   return`<h3>سجل الحضور</h3><div class="sub" style="margin-bottom:6px">${esc(e.name)} · ${esc(e.subject)}</div>${i.bl.map((b,k)=>`<div style="margin:12px 0"><div class="lbl" style="margin-top:0">اشتراك ${k+1} ${i.done[k]?'· مكتمل':''}</div><div class="cells">${[0,1,2,3].map(j=>cell(e,k*4+j)).join('')}</div></div>`).join('')}<div class="btns"><button class="btn ghost" onclick="openS(()=>stuHtml('${id}'))">رجوع</button></div>`}
+const DROP_WHY=['ظروف مالية','انتقل لمكان آخر','لا يرغب في المتابعة','تعارض في الوقت','أخرى'];
+function dropForm(id){const e=find(id);
+  return`<h3>تسجيل ${esc(e.name)} كمنقطع</h3><div class="sub" style="margin-bottom:10px;line-height:1.7">لن يظهر في الحضور ولا في تنبيهات التجديد، وتبقى بياناته. يمكن إعادة تفعيله في أي وقت.</div>
+  <form onsubmit="dropSave(event,'${id}')"><div class="fld"><label>السبب</label><div class="pick">${DROP_WHY.map((w,k)=>`<label><input type="radio" name="why" value="${esc(w)}" ${k===0?'checked':''}><span>${esc(w)}</span></label>`).join('')}</div></div>
+  <div class="fld"><label>تاريخ الانقطاع</label><input name="date" type="date" value="${today()}" required></div><div class="fld"><label>ملاحظة</label><input name="note"></div>
+  <div class="btns"><button class="btn pri">تسجيل كمنقطع</button><button type="button" class="btn ghost" onclick="openS(()=>stuHtml('${id}'))">رجوع</button></div></form>`}
+function dropSave(ev,id){ev.preventDefault();const f=ev.target,e=find(id);Object.assign(e,{st:'left',leftOn:f.date.value,leftWhy:f.why.value,leftNote:f.note.value.trim()});save();openS(()=>stuHtml(id));render();toast('تم التسجيل كمنقطع')}
+function reactivate(id){const e=find(id);['st','leftOn','leftWhy','leftNote'].forEach(k=>delete e[k]);save();openS(()=>stuHtml(id));render();toast('تمت إعادة التفعيل')}
+function undoLast(id){const e=find(id);if(!e)return;const i=info(e);let k=-1;for(let b=5;b>=0;b--){if(i.bl[b].any){k=b;break}}
+  if(k<0){toast('لا توجد حصص للتراجع عنها');return}let idx=-1;for(let j=3;j>=0;j--){if(e.att[k*4+j]){idx=k*4+j;break}}
+  e.att[idx]=null;save();render();if(SH)openS(()=>stuHtml(id));toast('تم التراجع عن آخر حصة')}
 function renewPay(id){openS(()=>paySheet(id,info(find(id)).price))}
 function paySheet(id,amt){
   const e=find(id),i=info(e);

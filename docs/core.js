@@ -15,7 +15,8 @@ function info(e){
   const done=bl.map(b=>b.y>=c);
   const cycles=done.filter(Boolean).length;
   let cur=done.indexOf(false); if(cur<0)cur=6;
-  const renew=cycles>0&&cur<6&&!bl[cur].any;
+  const left=e.st==='left';
+  const renew=!left&&cycles>0&&cur<6&&!bl[cur].any;
   const ended=cur===6;
   const subs=Math.max(1,cycles+(cur<6&&bl[cur].any?1:0));
   const price=priceOf(e), due=price*subs;
@@ -25,15 +26,15 @@ function info(e){
   bl.forEach((b,i)=>{if(done[i]){const ys=b.a.filter(x=>x&&x.v==='y');cd.push({block:i+1,date:ys[c-1]?.d||null,amount:price*pct})}});
   const sessions=bl.reduce((s,b)=>s+b.y,0);
   let pst; if(!price)pst='none'; else if(paid<=0)pst='bad'; else if(paid>=due)pst='ok'; else pst='part';
-  return{bl,done,cycles,cur,renew,ended,subs,price,due,paid,rest:Math.max(0,due-paid),pst,cd,earned:cycles*price*pct,expected:price*pct,sessions,teacher:t};
+  return{bl,done,cycles,cur,renew,ended,subs,price,due,paid,rest:Math.max(0,due-paid),pst,cd,earned:cycles*price*pct,expected:left?0:price*pct,sessions,teacher:t,left};
 }
 function totals(){
   let income=S.pay.reduce((s,p)=>s+num(p.amount),0),exp=S.exp.reduce((s,x)=>s+num(x.amount),0);
-  let earned=0,expected=0,rest=0,unpaid=0,cycles=0,sessions=0,renew=0;
-  S.enr.forEach(e=>{const i=info(e);earned+=i.earned;expected+=i.expected;rest+=i.rest;if(i.pst==='bad')unpaid++;cycles+=i.cycles;sessions+=i.sessions;if(i.renew)renew++});
-  const names=new Set(S.enr.map(e=>e.name.trim()));
+  let earned=0,expected=0,rest=0,unpaid=0,cycles=0,sessions=0,renew=0,left=0,leftRest=0;
+  S.enr.forEach(e=>{const i=info(e);earned+=i.earned;expected+=i.expected;rest+=i.rest;if(i.left){left++;leftRest+=i.rest}else if(i.pst==='bad')unpaid++;cycles+=i.cycles;sessions+=i.sessions;if(i.renew)renew++});
+  const names=new Set(S.enr.filter(e=>e.st!=='left').map(e=>e.name.trim()));
   const salPaid=S.tpay.reduce((s,p)=>s+num(p.amount),0),salLeft=TN().reduce((s,n)=>s+Math.max(0,tTotals(n).left),0);
-  return{salPaid,salLeft,income,exp,earned,expected,rest,unpaid,cycles,sessions,renew,net:income-exp-earned,students:names.size,enr:S.enr.length,teachers:new Set(S.teachers.map(t=>t.name)).size};
+  return{salPaid,salLeft,income,exp,earned,expected,rest,unpaid,cycles,sessions,renew,left,leftRest,net:income-exp-earned,students:names.size,enr:S.enr.length,teachers:new Set(S.teachers.map(t=>t.name)).size};
 }
 
 function fix(){S.tpay=S.tpay||[];S.seq=S.seq||{t:0,p:0,x:0};S.seq.tp=S.seq.tp||0;S.sync=S.sync||{}}
