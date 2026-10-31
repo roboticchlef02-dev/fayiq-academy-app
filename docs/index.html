@@ -1,0 +1,354 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#14264a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>فايق أكاديمي</title>
+<style>
+:root{--bg:#f4f6fb;--card:#fff;--ink:#16213a;--mute:#6a7590;--line:#e6eaf3;--navy:#14264a;--acc:#2563eb;--ok:#15803d;--warn:#b45309;--bad:#c0392b;--okbg:#e5f6ec;--warnbg:#fff1d9;--badbg:#fde8e8;--top:56px;--bot:64px;--sa:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;margin:0}
+body{font-family:"Segoe UI",Tahoma,system-ui,Arial,sans-serif;background:var(--bg);color:var(--ink);font-size:16px;line-height:1.45;overscroll-behavior:none;overflow:hidden}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;text-align:inherit}
+input,select,textarea{font:inherit;font-size:16px;width:100%;padding:13px 14px;border:1.5px solid #d3daea;border-radius:14px;background:#fff;color:var(--ink);min-height:50px}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--acc)}
+#app{height:100%;display:flex;flex-direction:column}
+.top{flex:none;display:flex;align-items:center;gap:10px;padding:calc(env(safe-area-inset-top,0px) + 8px) 16px 8px;background:var(--navy);color:#fff;min-height:var(--top)}
+.top h1{font-size:19px;margin:0;flex:1}
+.top .logo{width:32px;height:32px;border-radius:9px;background:#1f3a6e;display:flex;align-items:center;justify-content:center}.top .logo img{height:20px}
+.syn{display:flex;align-items:center;gap:7px;padding:7px 12px;border-radius:999px;background:rgba(255,255,255,.12);font-size:13px;min-height:36px}
+.syn i{width:9px;height:9px;border-radius:50%;background:#9fb0d3}.syn i.ok{background:#4ade80}.syn i.err{background:#f87171}.syn i.busy{background:#fbbf24;animation:p 1s infinite}
+@keyframes p{50%{opacity:.35}}
+#v{flex:1;overflow-y:auto;padding:14px 14px calc(var(--bot) + var(--sa) + 90px);-webkit-overflow-scrolling:touch}
+.tabs{position:fixed;inset-inline:0;bottom:0;display:flex;background:#fff;border-top:1px solid var(--line);padding-bottom:var(--sa);z-index:5}
+.tabs button{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 0 7px;color:var(--mute);font-size:12px;position:relative;min-height:var(--bot)}
+.tabs svg{width:25px;height:25px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.tabs button.on{color:var(--acc);font-weight:700}
+.badge{position:absolute;top:4px;inset-inline-start:calc(50% + 6px);background:#f59e0b;color:#16213a;font-size:11px;font-weight:700;border-radius:999px;min-width:18px;padding:0 5px;text-align:center}
+.fab{position:fixed;inset-inline-start:18px;bottom:calc(var(--bot) + var(--sa) + 16px);width:58px;height:58px;border-radius:50%;background:var(--acc);color:#fff;font-size:32px;line-height:1;box-shadow:0 6px 18px rgba(37,99,235,.45);display:flex;align-items:center;justify-content:center;z-index:6}
+.hero{background:linear-gradient(135deg,#14264a,#24457f);color:#fff;border-radius:22px;padding:20px;margin-bottom:12px}
+.hero small{color:#bcd0f3}.hero .big{font-size:34px;font-weight:800;margin:2px 0 4px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.stat{background:var(--card);border-radius:18px;padding:14px;border:1px solid var(--line)}
+.stat small{color:var(--mute);display:block}.stat b{font-size:19px;display:block;margin-top:3px}
+.h{font-size:15px;font-weight:700;margin:18px 4px 8px;color:#37436a}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:13px 14px;margin-bottom:9px;width:100%;display:block}
+.row{display:flex;align-items:center;gap:12px}
+.mid{flex:1;min-width:0}.mid b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.mid small{color:var(--mute)}
+.av{width:44px;height:44px;border-radius:50%;background:#e3ebfb;color:#1d4ed8;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px;flex:none}.av.lg{width:54px;height:54px;font-size:22px}
+.chip{display:inline-block;padding:4px 11px;border-radius:999px;font-size:13px;font-weight:600;white-space:nowrap}
+.t-ok{background:var(--okbg);color:var(--ok)}.t-warn{background:var(--warnbg);color:var(--warn)}.t-bad{background:var(--badbg);color:var(--bad)}.t-mute{background:#edf0f6;color:var(--mute)}
+.search{position:sticky;top:-14px;z-index:3;background:var(--bg);padding:2px 0 8px;margin-top:-4px}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:2px 0 10px;scrollbar-width:none}.chips::-webkit-scrollbar{display:none}
+.fc{flex:none;padding:9px 16px;border-radius:999px;background:#fff;border:1.5px solid var(--line);font-size:14.5px}
+.fc.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+.seg{display:flex;background:#e4e9f4;border-radius:14px;padding:4px;margin-bottom:12px}
+.seg button{flex:1;text-align:center;padding:11px 4px;border-radius:11px;font-weight:600;color:#44506b}.seg button.on{background:#fff;color:var(--ink);box-shadow:0 1px 4px rgba(0,0,0,.14)}
+.cells{display:flex;gap:10px}
+.cell{flex:1;height:54px;border:2px solid #cdd5e6;border-radius:15px;background:#fff;font-size:26px;display:flex;align-items:center;justify-content:center;user-select:none;touch-action:manipulation}
+.cell.y{background:var(--okbg);border-color:var(--ok);color:var(--ok)}.cell.n{background:var(--badbg);border-color:var(--bad);color:var(--bad)}
+.cell:active{transform:scale(.94)}
+.att{padding:14px}.att .top2{display:flex;justify-content:space-between;align-items:center;margin-bottom:11px;gap:8px}
+.att.renew{border-color:#f0c36d;background:#fffaf0}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;min-height:50px;padding:0 18px;border-radius:14px;background:#eaf0fc;color:#1d4ed8;font-weight:700;flex:1;text-align:center}
+.btn.pri{background:var(--acc);color:#fff}.btn.danger{background:var(--badbg);color:var(--bad)}.btn.ghost{background:#fff;border:1.5px solid var(--line);color:var(--ink)}
+.btns{display:flex;gap:10px;margin-top:10px}
+.kv{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}
+.kv>div{background:#f4f6fb;border-radius:14px;padding:10px;text-align:center}.kv small{display:block;color:var(--mute);font-size:12.5px}.kv b{font-size:16px}
+#sh{position:fixed;inset:0;z-index:20;pointer-events:none}
+#sh.open{pointer-events:auto}
+.sbg{position:absolute;inset:0;background:rgba(10,18,40,.5);opacity:0;transition:opacity .2s}
+.sheet{position:absolute;inset-inline:0;bottom:0;background:#fff;border-radius:24px 24px 0 0;padding:8px 18px calc(var(--sa) + 22px);max-height:92%;overflow-y:auto;transform:translateY(100%);transition:transform .22s ease}
+#sh.open .sbg{opacity:1}#sh.open .sheet{transform:none}
+.grab{width:42px;height:5px;border-radius:3px;background:#d3daea;margin:4px auto 14px}
+.sheet h3{margin:0;font-size:20px}.sheet .sub{color:var(--mute)}
+.sh-h{display:flex;gap:12px;align-items:center;margin-bottom:12px}
+.lbl{font-size:14px;color:var(--mute);margin:14px 2px 7px;font-weight:600}
+.fld{margin-bottom:12px}.fld label{display:block;font-size:14px;color:var(--mute);margin:0 2px 6px;font-weight:600}
+.pick{display:flex;flex-wrap:wrap;gap:8px}.pick label{margin:0}.pick input{display:none}
+.pick span{display:inline-block;padding:10px 15px;border-radius:12px;border:1.5px solid #d3daea;background:#fff;font-size:15px;color:var(--ink);font-weight:500}
+.pick input:checked+span{background:var(--acc);border-color:var(--acc);color:#fff}
+.quick{display:flex;gap:8px;margin-top:8px}.quick button{flex:1;padding:10px 4px;border-radius:12px;background:#eef2fa;text-align:center;font-size:14px;color:#1d4ed8;font-weight:600}
+.li{display:flex;justify-content:space-between;gap:10px;padding:12px 2px;border-bottom:1px solid var(--line)}.li:last-child{border:0}.li small{color:var(--mute)}
+.empty{text-align:center;color:var(--mute);padding:34px 10px}
+.warn{background:var(--warnbg);color:var(--warn);border-radius:16px;padding:12px 14px;margin-bottom:12px}
+#toast{position:fixed;inset-inline:16px;bottom:calc(var(--bot) + var(--sa) + 84px);background:#16213a;color:#fff;padding:13px 16px;border-radius:14px;z-index:40;text-align:center;opacity:0;pointer-events:none;transition:opacity .2s}#toast.on{opacity:.96}
+.hello{display:flex;flex-direction:column;align-items:center;text-align:center;padding:40px 22px;gap:14px}
+.hello img{width:90px;border-radius:22px}
+.menu .card{display:flex;align-items:center;gap:14px;font-weight:600}.menu svg{width:24px;height:24px;stroke:var(--acc);fill:none;stroke-width:1.8;flex:none}.menu small{display:block;color:var(--mute);font-weight:400}
+</style>
+</head>
+<body>
+<div id="app">
+  <header class="top"><div class="logo"><img src="logo-white.svg" alt=""></div><h1 id="ttl">فايق أكاديمي</h1><button class="syn" id="syn" onclick="syncTap()"></button></header>
+  <main id="v"></main>
+  <button class="fab" id="fab" onclick="fabTap()" style="display:none" aria-label="إضافة">+</button>
+  <nav class="tabs" id="tabs"></nav>
+</div>
+<div id="sh"></div><div id="toast"></div>
+
+<script src="core.js"></script>
+<script src="sync.js"></script>
+<script>
+const KEY='fayiq_academy_v1',$=id=>document.getElementById(id);
+const SEED={v:1,settings:{cycle:4,name:'فايق أكاديمي',lastBackup:null},lists:{levels:['ابتدائي','متوسط','ثانوي'],subjects:['الرياضيات','اللغة الفرنسية','اللغة الإنجليزية','الفيزياء'],methods:['نقدًا','CCP','BaridiMob','تحويل بنكي'],cats:['إيجار','كهرباء','ماء','إنترنت','رواتب','تجهيزات ولوازم','تسويق وإشهار','صيانة','أخرى']},teachers:[],enr:[],pay:[],exp:[],tpay:[],seq:{t:0,p:0,x:0}};
+let S,TAB='home',F={q:'',lv:'',chip:'',mt:'pay'},LAST='',SH=null;
+
+/* ---------- storage ---------- */
+function load(){try{const r=localStorage.getItem(KEY);S=r?JSON.parse(r):JSON.parse(JSON.stringify(SEED))}catch(e){S=JSON.parse(JSON.stringify(SEED))}fix()}
+function save(){
+  if(syncOn()&&S.sync.last)stamp();
+  try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}
+  if(syncOn())scheduleSync();
+}
+const PST={ok:['t-ok','مدفوع'],part:['t-warn','دفع جزئي'],bad:['t-bad','لم يدفع'],none:['t-mute','—']};
+const IC={
+ home:'<svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>',
+ stu:'<svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/><path d="M16 5a3.5 3.5 0 010 7M18 14c2.2.7 3.5 2.6 3.5 6"/></svg>',
+ att:'<svg viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="17" height="17" rx="4"/><path d="M8 12.5l3 3 5-6"/></svg>',
+ money:'<svg viewBox="0 0 24 24"><rect x="2.5" y="6" width="19" height="13" rx="3"/><path d="M2.5 10h19"/><circle cx="16.5" cy="14.5" r="1.4"/></svg>',
+ more:'<svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg>',
+ teach:'<svg viewBox="0 0 24 24"><path d="M3 9l9-5 9 5-9 5-9-5z"/><path d="M7 11.5V16c0 1.5 2.2 3 5 3s5-1.5 5-3v-4.5"/></svg>',
+ set:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 00-.1-1.2l2-1.5-2-3.4-2.3.9a7 7 0 00-2-1.2L14.2 3h-4l-.4 2.6a7 7 0 00-2 1.2l-2.3-.9-2 3.4 2 1.5a7 7 0 000 2.4l-2 1.5 2 3.4 2.3-.9a7 7 0 002 1.2l.4 2.6h4l.4-2.6a7 7 0 002-1.2l2.3.9 2-3.4-2-1.5c.1-.4.1-.8.1-1.2z"/></svg>',
+ save:'<svg viewBox="0 0 24 24"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 17v3h16v-3"/></svg>',
+ link:'<svg viewBox="0 0 24 24"><path d="M10 14a4 4 0 005.7 0l3-3a4 4 0 00-5.7-5.7l-1 1M14 10a4 4 0 00-5.7 0l-3 3a4 4 0 005.7 5.7l1-1"/></svg>'};
+const TABS=[['home','الرئيسية'],['stu','التلاميذ'],['att','الحضور'],['money','المال'],['more','المزيد']];
+
+/* ---------- shell ---------- */
+function go(t){if(SH)closeS();TAB=t;F.q='';F.lv='';F.chip=t==='money'?F.chip:'';render()}
+function render(){
+  fix();
+  $('ttl').textContent=S.settings.name||'فايق أكاديمي';
+  const rn=S.enr.reduce((n,e)=>n+(info(e).renew?1:0),0);
+  $('tabs').innerHTML=TABS.map(([k,l])=>`<button class="${k===TAB?'on':''}" onclick="go('${k}')">${IC[k==='more'?'more':k]}${l}${k==='att'&&rn?`<span class="badge">${rn}</span>`:''}</button>`).join('');
+  const v=$('v'),keep=LAST===TAB,st=v.scrollTop;
+  v.innerHTML=VIEW[TAB]();
+  if(keep)v.scrollTop=st;else v.scrollTop=0;
+  LAST=TAB;
+  $('fab').style.display=FAB[TAB+(TAB==='money'?F.mt:'')]?'flex':'none';
+  renderSyn();refreshSheet();
+}
+function toast(m){const t=$('toast');t.textContent=m;t.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('on'),2200)}
+function openS(fn){SH=fn;$('sh').innerHTML=`<div class="sbg" onclick="closeS()"></div><div class="sheet"><div class="grab"></div><div id="shc">${fn()}</div></div>`;requestAnimationFrame(()=>requestAnimationFrame(()=>$('sh').classList.add('open')))}
+function refreshSheet(){const c=$('shc');if(SH&&c&&!c.querySelector('form'))c.innerHTML=SH()}
+function closeS(){SH=null;$('sh').classList.remove('open');setTimeout(()=>{if(!SH)$('sh').innerHTML=''},240)}
+const initial=n=>[...String(n).trim()][0]||'?';
+const find=id=>S.enr.find(e=>String(e.id)===String(id));
+function filt(){const q=F.q.trim().toLowerCase();return S.enr.filter(e=>(!q||e.name.toLowerCase().includes(q)||String(e.phone).includes(q)||e.subject.toLowerCase().includes(q))&&(!F.lv||e.level===F.lv))}
+const searchBar=ph=>`<div class="search"><input type="search" id="q" placeholder="${ph}" value="${esc(F.q)}" oninput="F.q=this.value;redo()" enterkeyhint="search"></div>`;
+const lvChips=()=>`<div class="chips"><button class="fc ${!F.lv?'on':''}" onclick="F.lv='';redo()">كل الأطوار</button>${S.lists.levels.map(l=>`<button class="fc ${F.lv===l?'on':''}" onclick="F.lv='${esc(l)}';redo()">${esc(l)}</button>`).join('')}</div>`;
+function redo(){const q=$('q'),pos=q?q.selectionStart:0,had=q&&document.activeElement===q;render();if(had){const n=$('q');n.focus();n.setSelectionRange(pos,pos)}}
+
+/* ---------- sync status ---------- */
+const hm=ts=>{const d=new Date(ts);return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')};
+function renderSyn(){
+  const el=$('syn');if(!syncOn()){el.innerHTML='<i></i>غير مرتبط';return}
+  const st=SYNC.state==='syncing'?'busy':SYNC.state==='error'?'err':'ok';
+  el.innerHTML=`<i class="${st}"></i>${SYNC.state==='syncing'?'جارٍ…':SYNC.state==='error'?'تعذّرت':S.sync.last?hm(S.sync.last):'—'}`;
+}
+window.onSyncChange=renderSyn;
+window.onSynced=()=>{render();toast('تم تحديث البيانات')};
+async function syncTap(){
+  if(!syncOn()){go('more');return}
+  const r=await syncNow('manual');toast(r.ok?'تمت المزامنة':(r.msg||'تعذّرت المزامنة'));
+}
+
+/* ---------- views ---------- */
+const VIEW={},FAB={stu:1,exp0:0,moneyexp:1,moneypay:0,moneytea:0};
+VIEW.home=()=>{
+  if(!S.enr.length&&!syncOn())return onboarding();
+  const t=totals(),rn=S.enr.filter(e=>info(e).renew).length;
+  const stat=(l,v)=>`<div class="stat"><small>${l}</small><b>${v}</b></div>`;
+  const nt=TN().filter(n=>tTotals(n).left>0).length;
+  const item=(txt,n,fn,cls)=>n?`<button class="card row" onclick="${fn}"><div class="mid"><b>${txt}</b></div><span class="chip ${cls}">${n}</span></button>`:'';
+  const alerts=item('اشتراكات بانتظار التجديد',rn,"go('att')",'t-warn')+item('تلاميذ لم يدفعوا',t.unpaid,"F.chip='due';go('money')",'t-bad')+item('أساتذة لهم رواتب متبقية',nt,"F.mt='tea';go('money')",'t-warn');
+  return`<div class="hero"><small>الربح الصافي</small><div class="big">${money(t.net)}</div><small>بعد المصاريف ورواتب الأساتذة المستحقة</small></div>
+  <div class="grid">${stat('المداخيل',money(t.income))}${stat('المصاريف',money(t.exp))}${stat('رواتب مستحقة',money(t.earned))}${stat('المتبقي للتحصيل',money(t.rest))}</div>
+  <div class="grid">${stat('التلاميذ',t.students)}${stat('الاشتراكات المسجلة',t.enr)}</div>
+  <div class="h">تحتاج انتباهك</div>${alerts||'<div class="empty">كل شيء على ما يرام</div>'}`;
+};
+function onboarding(){return`<div class="hello"><img src="icon-192.png" alt=""><h2 style="margin:0">أهلًا بك</h2><p class="mut" style="color:var(--mute);margin:0">اربط التطبيق بحاسوب الأكاديمية لعرض البيانات وتعديلها.</p>
+  <div class="card" style="text-align:right"><b>الطريقة الأسهل</b><p style="margin:6px 0 0;color:var(--mute)">في برنامج الحاسوب: الإعدادات ← «ربط الهاتف (QR)». امسح الرمز بكاميرا هذا الهاتف.</p></div>
+  <form class="card" style="text-align:right" onsubmit="pairSubmit(event)"><div class="fld"><label>أو الصق رابط/رمز الربط</label><input name="c" dir="ltr" placeholder="FQ1…" autocomplete="off" required></div><button class="btn pri" style="width:100%">ربط</button></form></div>`}
+
+VIEW.stu=()=>{
+  const l=filt();
+  return searchBar('ابحث عن تلميذ أو مادة')+lvChips()+(l.length?l.map(e=>{const i=info(e),p=PST[i.pst];
+    return`<button class="card row" onclick="openS(()=>stuHtml('${e.id}'))"><div class="av">${esc(initial(e.name))}</div><div class="mid"><b>${esc(e.name)}</b><small>${esc(e.subject)} · ${esc(e.level)}</small></div><span class="chip ${p[0]}">${p[1]}</span></button>`}).join(''):'<div class="empty">لا توجد نتائج</div>');
+};
+VIEW.att=()=>{
+  let l=filt();if(F.chip==='renew')l=l.filter(e=>info(e).renew);
+  const chips=`<div class="chips"><button class="fc ${F.chip!=='renew'?'on':''}" onclick="F.chip='';redo()">الكل</button><button class="fc ${F.chip==='renew'?'on':''}" onclick="F.chip='renew';redo()">بانتظار التجديد</button></div>`;
+  return searchBar('ابحث لتسجيل الحضور')+chips+(l.length?l.map(e=>{const i=info(e),b=Math.min(i.cur,5);
+    const st=i.ended?'<span class="chip t-ok">اكتملت الاشتراكات</span>':i.renew?'<span class="chip t-warn">أكمل الدورة — جدّد</span>':`<span class="chip t-mute">${i.bl[i.cur].y} / ${CYC()} · اشتراك ${i.cur+1}</span>`;
+    return`<div class="card att ${i.renew?'renew':''}"><div class="top2"><div class="mid"><b>${esc(e.name)}</b><small>${esc(e.subject)}</small></div>${st}</div>
+     <div class="cells">${[0,1,2,3].map(k=>cell(e,b*4+k)).join('')}</div>
+     ${i.renew?`<div class="btns"><button class="btn pri" onclick="renewPay('${e.id}')">تجديد + دفعة</button></div>`:''}</div>`}).join(''):'<div class="empty">لا توجد نتائج</div>');
+};
+function cell(e,idx){const a=e.att[idx],c=a?a.v:'';return`<button class="cell ${c}" onclick="tog('${e.id}',${idx})">${c==='y'?'✓':c==='n'?'✗':''}</button>`}
+function tog(id,idx){const e=find(id),a=e.att[idx];e.att[idx]=!a?{v:'y',d:today()}:a.v==='y'?{v:'n',d:null}:null;save();if(navigator.vibrate)navigator.vibrate(12);render()}
+
+VIEW.money=()=>{
+  const seg=`<div class="seg"><button class="${F.mt==='pay'?'on':''}" onclick="F.mt='pay';render()">المدفوعات</button><button class="${F.mt==='exp'?'on':''}" onclick="F.mt='exp';render()">المصاريف</button><button class="${F.mt==='tea'?'on':''}" onclick="F.mt='tea';render()">الأساتذة</button></div>`;
+  return seg+VIEW['m_'+F.mt]();
+};
+VIEW.m_pay=()=>{
+  const due=F.chip!=='all';
+  let l=filt().map(e=>({e,i:info(e)}));if(due)l=l.filter(x=>x.i.rest>0&&x.i.price>0);l.sort((a,b)=>b.i.rest-a.i.rest);
+  const tot=l.reduce((s,x)=>s+x.i.rest,0);
+  return searchBar('ابحث عن تلميذ')+`<div class="chips"><button class="fc ${due?'on':''}" onclick="F.chip='due';redo()">عليهم متبقي</button><button class="fc ${!due?'on':''}" onclick="F.chip='all';redo()">الكل</button></div>
+   ${due?`<div class="warn" style="background:#eef2fa;color:var(--ink)">إجمالي المتبقي: <b>${money(tot)}</b> · ${l.length} تلميذ</div>`:''}`
+   +(l.length?l.map(({e,i})=>{const p=PST[i.pst];return`<button class="card row" onclick="openS(()=>paySheet('${e.id}'))"><div class="mid"><b>${esc(e.name)}</b><small>${esc(e.subject)} · مدفوع ${money(i.paid)} من ${money(i.due)}</small></div><div style="text-align:left"><b>${i.rest?money(i.rest):''}</b><br><span class="chip ${p[0]}">${p[1]}</span></div></button>`}).join(''):'<div class="empty">لا توجد نتائج</div>');
+};
+VIEW.m_exp=()=>{
+  const l=[...S.exp].sort((a,b)=>(b.date||'').localeCompare(a.date||'')),tot=l.reduce((s,x)=>s+num(x.amount),0);
+  return`<div class="warn" style="background:#eef2fa;color:var(--ink)">إجمالي المصاريف: <b>${money(tot)}</b></div>`+(l.length?l.map(x=>`<button class="card row" onclick="openS(()=>expForm('${x.id}'))"><div class="mid"><b>${esc(x.desc)}</b><small>${esc(x.cat)} · ${fd(x.date)}</small></div><b>${money(x.amount)}</b></button>`).join(''):'<div class="empty">لا توجد مصاريف</div>');
+};
+VIEW.m_tea=()=>{
+  const n=TN();
+  return n.length?n.map((nm,i)=>{const x=tTotals(nm);return`<button class="card" onclick="openS(()=>teaSheet(${i}))"><div class="row"><div class="av">${esc(initial(nm))}</div><div class="mid"><b>${esc(nm)}</b><small>مستحق ${money(x.earned)} · مدفوع ${money(x.paid)}</small></div></div>
+    <div class="row" style="margin-top:9px;justify-content:space-between"><small style="color:var(--mute)">المتبقي للدفع</small><b style="color:${x.left>0?'var(--ok)':x.left<0?'var(--warn)':'inherit'}">${money(Math.abs(x.left))}${x.left<0?' (زيادة)':''}</b></div></button>`}).join(''):'<div class="empty">لا يوجد أساتذة. أضفهم من «المزيد».</div>';
+};
+VIEW.more=()=>{
+  const sy=syncOn()?`<div class="card"><div class="row"><div class="mid"><b>المزامنة</b><small>${esc(SYNC.state==='error'?SYNC.msg:S.sync.last?'آخر مزامنة '+hm(S.sync.last):'لم تتم بعد')}${S.sync.dirty?' · تغييرات بانتظار الرفع':''}</small></div></div>
+    <div class="btns"><button class="btn pri" onclick="syncTap()">مزامنة الآن</button><button class="btn danger" onclick="unpair()">فصل</button></div></div>`
+   :`<form class="card" onsubmit="pairSubmit(event)"><b>ربط بحاسوب الأكاديمية</b><div class="fld" style="margin-top:10px"><input name="c" dir="ltr" placeholder="الصق رابط أو رمز الربط" required></div><button class="btn pri" style="width:100%">ربط</button></form>`;
+  const m=(ic,t,s,fn)=>`<button class="card row" onclick="${fn}">${IC[ic]}<div class="mid"><b>${t}</b><small>${s}</small></div></button>`;
+  return sy+`<div class="menu"><div class="h">الإدارة</div>${m('teach','الأساتذة والمواد','إضافة وتعديل الأساتذة والأسعار والنسب','openS(teaList)')}${m('set','الإعدادات','اسم الأكاديمية، حصص الاشتراك، القوائم','openS(setForm)')}${m('save','نسخة احتياطية','تنزيل ملف بكل البيانات','backup()')}
+  <div class="h">تثبيت التطبيق</div><div class="card" style="color:var(--mute)">Android: قائمة المتصفح ⋮ ← «إضافة إلى الشاشة الرئيسية».<br>iPhone: زر المشاركة ← «إضافة إلى الشاشة الرئيسية».</div></div>`;
+};
+const FABS={stu:()=>openS(stuForm),moneyexp:()=>openS(()=>expForm())};
+function fabTap(){(FABS[TAB+(TAB==='money'?F.mt:'')]||(()=>{}))()}
+
+/* ---------- sheets ---------- */
+const closeBtn=`<div class="btns"><button class="btn ghost" onclick="closeS()">إغلاق</button></div>`;
+function stuHtml(id){
+  const e=find(id);if(!e){closeS();return''}const i=info(e),b=Math.min(i.cur,5),p=PST[i.pst];
+  const st=i.ended?'اكتملت كل الاشتراكات':i.renew?'أكمل الدورة — جاهز للتجديد':`${i.bl[i.cur].y} / ${CYC()} حصص`;
+  const pays=S.pay.filter(x=>String(x.eid)===String(id)).sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  return`<div class="sh-h"><div class="av lg">${esc(initial(e.name))}</div><div class="mid"><h3>${esc(e.name)}</h3><div class="sub">${esc(e.subject)} · ${esc(e.level)}${e.phone?' · '+esc(e.phone):''}</div></div></div>
+   <div class="lbl">الحضور — اشتراك ${b+1} · ${st}</div><div class="cells">${[0,1,2,3].map(k=>cell(e,b*4+k)).join('')}</div>
+   <div class="kv"><div><small>سعر الاشتراك</small><b>${money(i.price)}</b></div><div><small>المتبقي</small><b>${money(i.rest)}</b></div><div><small>الدفع</small><b><span class="chip ${p[0]}">${p[1]}</span></b></div></div>
+   <div class="btns"><button class="btn pri" onclick="openS(()=>paySheet('${id}'))">تسجيل دفعة</button><button class="btn" onclick="openS(()=>histHtml('${id}'))">سجل الحضور</button></div>
+   <div class="lbl">آخر الدفعات</div>${pays.length?pays.slice(0,5).map(x=>`<div class="li"><div><b>${money(x.amount)}</b><br><small>${esc(x.method)}${x.note?' · '+esc(x.note):''}</small></div><small>${fd(x.date)}</small></div>`).join(''):'<div class="sub" style="padding:6px 2px">لا توجد دفعات</div>'}
+   <div class="btns" style="margin-top:16px"><button class="btn" onclick="openS(()=>stuEditForm('${id}'))">تعديل</button><button class="btn danger" onclick="stuDel('${id}')">حذف</button></div>`;
+}
+function histHtml(id){const e=find(id),i=info(e);
+  return`<h3>سجل الحضور</h3><div class="sub" style="margin-bottom:6px">${esc(e.name)} · ${esc(e.subject)}</div>${i.bl.map((b,k)=>`<div style="margin:12px 0"><div class="lbl" style="margin-top:0">اشتراك ${k+1} ${i.done[k]?'· مكتمل':''}</div><div class="cells">${[0,1,2,3].map(j=>cell(e,k*4+j)).join('')}</div></div>`).join('')}<div class="btns"><button class="btn ghost" onclick="openS(()=>stuHtml('${id}'))">رجوع</button></div>`}
+function renewPay(id){openS(()=>paySheet(id,info(find(id)).price))}
+function paySheet(id,amt){
+  const e=find(id),i=info(e);
+  return`<h3>تسجيل دفعة</h3><div class="sub" style="margin-bottom:12px">${esc(e.name)} · ${esc(e.subject)} — المتبقي ${money(i.rest)}</div>
+  <form onsubmit="paySave(event,'${id}')"><div class="fld"><label>المبلغ (دج)</label><input name="amount" type="number" inputmode="numeric" min="1" required value="${amt||i.rest||i.price||''}" style="font-size:22px;font-weight:700">
+   <div class="quick">${i.rest?`<button type="button" onclick="this.form.amount.value=${i.rest}">المتبقي</button>`:''}${i.price?`<button type="button" onclick="this.form.amount.value=${i.price}">اشتراك كامل</button>`:''}</div></div>
+   <div class="fld"><label>الطريقة</label><div class="pick">${S.lists.methods.map((m,k)=>`<label><input type="radio" name="method" value="${esc(m)}" ${k===0?'checked':''}><span>${esc(m)}</span></label>`).join('')}</div></div>
+   <div class="fld"><label>التاريخ</label><input name="date" type="date" value="${today()}" required></div>
+   <div class="fld"><label>ملاحظة</label><input name="note"></div>
+   <div class="btns"><button class="btn pri">حفظ الدفعة</button><button type="button" class="btn ghost" onclick="closeS()">إلغاء</button></div></form>`;
+}
+function paySave(ev,id){ev.preventDefault();const f=ev.target;S.pay.push({id:uid(),eid:id,amount:num(f.amount.value),method:f.method.value,date:f.date.value,note:f.note.value});save();closeS();render();toast('تم تسجيل الدفعة')}
+function stuForm(){
+  return`<h3>تلميذ جديد</h3><form onsubmit="stuAdd(event)" style="margin-top:12px"><div class="fld"><label>الاسم</label><input name="name" required autocomplete="off"></div>
+  <div class="fld"><label>الهاتف</label><input name="phone" type="tel" inputmode="tel"></div>
+  <div class="fld"><label>الطور</label><div class="pick">${S.lists.levels.map((l,k)=>`<label><input type="radio" name="level" value="${esc(l)}" ${k===0?'checked':''}><span>${esc(l)}</span></label>`).join('')}</div></div>
+  <div class="fld"><label>المواد (يمكن اختيار أكثر من واحدة)</label><div class="pick">${S.lists.subjects.map(s=>`<label><input type="checkbox" name="subj" value="${esc(s)}"><span>${esc(s)}</span></label>`).join('')}</div></div>
+  <div class="btns"><button class="btn pri">حفظ</button><button type="button" class="btn ghost" onclick="closeS()">إلغاء</button></div></form>`}
+function stuAdd(ev){ev.preventDefault();const f=ev.target,ss=[...f.querySelectorAll('[name=subj]:checked')].map(x=>x.value);
+  if(!ss.length){toast('اختر مادة واحدة على الأقل');return}
+  ss.forEach(s=>{const t=S.teachers.find(t=>t.subject===s&&t.level===f.level.value);
+    S.enr.push({id:nextEnrId('M'),name:f.name.value.trim(),age:'',level:f.level.value,subject:s,phone:f.phone.value.trim(),price:t?t.price:0,reg:today(),att:Array(24).fill(null)})});
+  save();closeS();render();toast('تمت الإضافة')}
+function stuEditForm(id){const e=find(id);
+  return`<h3>تعديل التلميذ</h3><form onsubmit="stuSave(event,'${id}')" style="margin-top:12px"><div class="fld"><label>الاسم</label><input name="name" value="${esc(e.name)}" required></div>
+  <div class="fld"><label>الهاتف</label><input name="phone" type="tel" value="${esc(e.phone)}"></div>
+  <div class="fld"><label>الطور</label><select name="level">${S.lists.levels.map(l=>`<option ${l===e.level?'selected':''}>${esc(l)}</option>`).join('')}</select></div>
+  <div class="fld"><label>المادة</label><select name="subject">${S.lists.subjects.map(l=>`<option ${l===e.subject?'selected':''}>${esc(l)}</option>`).join('')}</select></div>
+  <div class="fld"><label>سعر الاشتراك (دج)</label><input name="price" type="number" inputmode="numeric" value="${esc(e.price||'')}"></div>
+  <div class="btns"><button class="btn pri">حفظ</button><button type="button" class="btn ghost" onclick="openS(()=>stuHtml('${id}'))">رجوع</button></div></form>`}
+function stuSave(ev,id){ev.preventDefault();const f=ev.target,e=find(id);Object.assign(e,{name:f.name.value.trim(),phone:f.phone.value.trim(),level:f.level.value,subject:f.subject.value,price:num(f.price.value)});save();openS(()=>stuHtml(id));render();toast('تم الحفظ')}
+function stuDel(id){const e=find(id);if(!confirm(`حذف ${e.name} — ${e.subject}؟ سيُحذف حضوره ومدفوعاته.`))return;S.enr=S.enr.filter(x=>String(x.id)!==String(id));S.pay=S.pay.filter(p=>String(p.eid)!==String(id));save();closeS();render();toast('تم الحذف')}
+
+function expForm(id){const x=S.exp.find(v=>String(v.id)===String(id))||{desc:'',cat:S.lists.cats[0],amount:'',date:today()};
+  return`<h3>${id?'تعديل مصروف':'مصروف جديد'}</h3><form onsubmit="expSave(event,'${id||''}')" style="margin-top:12px"><div class="fld"><label>الوصف</label><input name="desc" required value="${esc(x.desc)}"></div>
+  <div class="fld"><label>المبلغ (دج)</label><input name="amount" type="number" inputmode="numeric" min="1" required value="${esc(x.amount)}" style="font-size:22px;font-weight:700"></div>
+  <div class="fld"><label>الفئة</label><div class="pick">${S.lists.cats.map(c=>`<label><input type="radio" name="cat" value="${esc(c)}" ${c===x.cat?'checked':''}><span>${esc(c)}</span></label>`).join('')}</div></div>
+  <div class="fld"><label>التاريخ</label><input name="date" type="date" value="${esc(x.date)}" required></div>
+  <div class="btns"><button class="btn pri">حفظ</button>${id?`<button type="button" class="btn danger" onclick="expDel('${id}')">حذف</button>`:''}<button type="button" class="btn ghost" onclick="closeS()">إلغاء</button></div></form>`}
+function expSave(ev,id){ev.preventDefault();const f=ev.target,d={desc:f.desc.value.trim(),cat:f.cat.value,amount:num(f.amount.value),date:f.date.value};
+  if(id)Object.assign(S.exp.find(v=>String(v.id)===id),d);else S.exp.push({id:uid(),...d});save();closeS();render();toast('تم الحفظ')}
+function expDel(id){if(!confirm('حذف هذا المصروف؟'))return;S.exp=S.exp.filter(x=>String(x.id)!==String(id));save();closeS();render()}
+
+function teaSheet(i){
+  const n=TN()[i],x=tTotals(n),lines=[];
+  S.enr.forEach(e=>{const t=teacherFor(e);if(t&&t.name===n)info(e).cd.forEach(c=>lines.push({e,c}))});lines.sort((a,b)=>(b.c.date||'').localeCompare(a.c.date||''));
+  const pays=S.tpay.filter(p=>p.name===n).sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  return`<div class="sh-h"><div class="av lg">${esc(initial(n))}</div><div class="mid"><h3>${esc(n)}</h3><div class="sub">${esc(S.teachers.filter(t=>t.name===n).map(t=>t.subject).join('، '))}</div></div></div>
+  <div class="kv"><div><small>المستحق</small><b>${money(x.earned)}</b></div><div><small>المدفوع</small><b>${money(x.paid)}</b></div><div><small>المتبقي</small><b>${money(x.left)}</b></div></div>
+  <div class="btns"><button class="btn pri" onclick="openS(()=>tpayForm(${i}))">دفع راتب</button></div>
+  <div class="lbl">الدفعات</div>${pays.length?pays.map(p=>`<div class="li"><div><b>${money(p.amount)}</b><br><small>${esc(p.method)}${p.note?' · '+esc(p.note):''}</small></div><div style="text-align:left"><small>${fd(p.date)}</small><br><button style="color:var(--bad);font-size:13px" onclick="tpayDel(${p.id},${i})">حذف</button></div></div>`).join(''):'<div class="sub">لا توجد دفعات</div>'}
+  <div class="lbl">الدورات المكتملة</div>${lines.length?lines.slice(0,15).map(l=>`<div class="li"><div><b>${esc(l.e.name)}</b><br><small>${esc(l.e.subject)} · اشتراك ${l.c.block}</small></div><div style="text-align:left"><b>${money(l.c.amount)}</b><br><small>${fd(l.c.date)}</small></div></div>`).join(''):'<div class="sub">لا توجد دورات مكتملة بعد</div>'}${closeBtn}`}
+function tpayForm(i){const n=TN()[i],x=tTotals(n);
+  return`<h3>دفع راتب — ${esc(n)}</h3><div class="sub" style="margin-bottom:12px">المستحق ${money(x.earned)} · المدفوع ${money(x.paid)} · المتبقي ${money(x.left)}</div>
+  <form onsubmit="tpaySave(event,${i})"><div class="fld"><label>المبلغ (دج)</label><input name="amount" type="number" inputmode="numeric" min="1" required value="${x.left>0?x.left:''}" style="font-size:22px;font-weight:700">${x.left>0?`<div class="quick"><button type="button" onclick="this.form.amount.value=${x.left}">كامل المتبقي</button></div>`:''}</div>
+  <div class="fld"><label>الطريقة</label><div class="pick">${S.lists.methods.map((m,k)=>`<label><input type="radio" name="method" value="${esc(m)}" ${k===0?'checked':''}><span>${esc(m)}</span></label>`).join('')}</div></div>
+  <div class="fld"><label>التاريخ</label><input name="date" type="date" value="${today()}" required></div><div class="fld"><label>ملاحظة</label><input name="note"></div>
+  <div class="btns"><button class="btn pri">حفظ</button><button type="button" class="btn ghost" onclick="openS(()=>teaSheet(${i}))">رجوع</button></div></form>`}
+function tpaySave(ev,i){ev.preventDefault();const f=ev.target,n=TN()[i],amt=num(f.amount.value),x=tTotals(n);
+  if(amt>x.left&&!confirm('المبلغ أكبر من المتبقي. هل هو دفع مقدّم؟'))return;
+  S.tpay.push({id:uid(),name:n,amount:amt,method:f.method.value,date:f.date.value,note:f.note.value});save();openS(()=>teaSheet(i));render();toast('تم تسجيل الدفعة')}
+function tpayDel(id,i){if(!confirm('حذف هذه الدفعة؟'))return;S.tpay=S.tpay.filter(p=>String(p.id)!==String(id));save();openS(()=>teaSheet(i));render()}
+
+function teaList(){
+  return`<h3>الأساتذة والمواد</h3><div class="sub" style="margin-bottom:10px">الراتب = دورات مكتملة × سعر التلميذ × النسبة</div>
+  ${S.teachers.length?S.teachers.map(t=>`<button class="card row" onclick="openS(()=>teaForm('${t.id}'))"><div class="mid"><b>${esc(t.name)}</b><small>${esc(t.subject)} · ${esc(t.level)}</small></div><div style="text-align:left"><b>${money(t.price)}</b><br><small>${t.pct}%</small></div></button>`).join(''):'<div class="empty">لا يوجد أساتذة</div>'}
+  <div class="btns"><button class="btn pri" onclick="openS(()=>teaForm())">+ أستاذ / مادة</button><button class="btn ghost" onclick="closeS()">إغلاق</button></div>`}
+function teaForm(id){const t=S.teachers.find(v=>String(v.id)===String(id))||{name:'',subject:S.lists.subjects[0],level:S.lists.levels[0],price:'',pct:50};
+  return`<h3>${id?'تعديل':'أستاذ جديد'}</h3><form onsubmit="teaSave(event,'${id||''}')" style="margin-top:12px"><div class="fld"><label>الاسم</label><input name="name" required value="${esc(t.name)}" list="tn"><datalist id="tn">${TN().map(n=>`<option>${esc(n)}`).join('')}</datalist></div>
+  <div class="fld"><label>المادة</label><select name="subject">${S.lists.subjects.map(s=>`<option ${s===t.subject?'selected':''}>${esc(s)}</option>`).join('')}</select></div>
+  <div class="fld"><label>الطور</label><select name="level">${S.lists.levels.map(s=>`<option ${s===t.level?'selected':''}>${esc(s)}</option>`).join('')}</select></div>
+  <div class="fld"><label>سعر التلميذ (دج)</label><input name="price" type="number" inputmode="numeric" required value="${esc(t.price)}"></div>
+  <div class="fld"><label>النسبة %</label><input name="pct" type="number" inputmode="numeric" min="0" max="100" required value="${esc(t.pct)}"></div>
+  <div class="btns"><button class="btn pri">حفظ</button>${id?`<button type="button" class="btn danger" onclick="teaDel('${id}')">حذف</button>`:''}<button type="button" class="btn ghost" onclick="openS(teaList)">رجوع</button></div></form>`}
+function teaSave(ev,id){ev.preventDefault();const f=ev.target,d={name:f.name.value.trim(),subject:f.subject.value,level:f.level.value,price:num(f.price.value),pct:num(f.pct.value)};
+  if(S.teachers.some(t=>String(t.id)!==id&&t.subject===d.subject&&t.level===d.level)){toast('يوجد أستاذ آخر لنفس المادة والطور');return}
+  if(id){const o=S.teachers.find(v=>String(v.id)===id).name;if(o!==d.name&&!S.teachers.some(t=>String(t.id)!==id&&t.name===o))S.tpay.forEach(p=>{if(p.name===o)p.name=d.name});Object.assign(S.teachers.find(v=>String(v.id)===id),d)}
+  else S.teachers.push({id:uid(),...d});save();openS(teaList);render()}
+function teaDel(id){if(!confirm('حذف هذا الأستاذ؟'))return;S.teachers=S.teachers.filter(t=>String(t.id)!==id);save();openS(teaList);render()}
+
+function setForm(){
+  return`<h3>الإعدادات</h3><form onsubmit="setSave(event)" style="margin-top:12px"><div class="fld"><label>اسم الأكاديمية</label><input name="name" value="${esc(S.settings.name)}"></div>
+  <div class="fld"><label>عدد الحصص في الاشتراك (1–4)</label><input name="cycle" type="number" inputmode="numeric" min="1" max="4" value="${CYC()}"></div>
+  ${[['levels','الأطوار'],['subjects','المواد'],['methods','طرق الدفع'],['cats','فئات المصاريف']].map(([k,l])=>`<div class="fld"><label>${l} (سطر لكل عنصر)</label><textarea name="${k}" rows="${k==='subjects'?6:3}">${esc(S.lists[k].join('\n'))}</textarea></div>`).join('')}
+  <div class="btns"><button class="btn pri">حفظ</button><button type="button" class="btn ghost" onclick="closeS()">إلغاء</button></div></form>`}
+function setSave(ev){ev.preventDefault();const f=ev.target,ln=t=>t.split('\n').map(x=>x.trim()).filter(Boolean);
+  S.settings.name=f.name.value.trim()||'فايق أكاديمي';S.settings.cycle=Math.min(4,Math.max(1,num(f.cycle.value)||4));
+  S.lists={levels:ln(f.levels.value),subjects:ln(f.subjects.value),methods:ln(f.methods.value),cats:ln(f.cats.value)};save();closeS();render();toast('تم الحفظ')}
+function backup(){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(S)],{type:'application/json'}));a.download='fayiq-backup-'+today()+'.json';document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500)}
+
+/* ---------- pairing ---------- */
+async function pairSubmit(ev){
+  ev.preventDefault();const f=ev.target,b=f.querySelector('button');b.disabled=true;
+  try{const r=await enableSync(f.c.value);render();toast(r&&r.ok?'تم الربط بنجاح':'تم الربط — '+(r&&r.msg||''))}catch(e){toast(e.message||'فشل الربط');b.disabled=false}
+}
+function unpair(){if(!confirm('فصل هذا الهاتف؟ تبقى البيانات على الهاتف.'))return;disableSync();render()}
+
+/* ---------- start ---------- */
+load();render();
+(async()=>{
+  const m=location.hash.match(/c=([^&]+)/);
+  if(m){history.replaceState(null,'',location.pathname+location.search);
+    $('v').innerHTML='<div class="hello"><h2>جارٍ الربط…</h2></div>';
+    try{await enableSync('FQ1.'+m[1].replace(/^FQ1\./,''));render();toast('تم الربط بنجاح')}catch(e){render();toast(e.message||'فشل الربط')}}
+  startSyncTimers();
+})();
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script>
+</body>
+</html>
